@@ -1,28 +1,19 @@
 import React, { useState } from "react";
-import { FiEdit2, FiTrash2, FiSearch } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiSearch } from "react-icons/fi";
 import { initialGroups } from "../data";
 import "../styles/Groups.css";
 
 const fieldsConfig = [
-  { key: "name", placeholder: "Название группы" },
+  { key: "name", placeholder: "Названия группы" },
   { key: "teacher", placeholder: "Учитель" },
   { key: "time", placeholder: "Время уроков" },
   { key: "days", placeholder: "Дни уроков" },
 ];
 
-const checkIsActive = (status) => {
-  const statusStr = String(status || "")
-    .toLowerCase()
-    .trim();
-  return (
-    statusStr === "активный" ||
-    statusStr === "активная" ||
-    statusStr === "active"
-  );
-};
-
 function Groups() {
-  const [groupsList, setGroupsList] = useState(initialGroups || []);
+  const [groupsList, setGroupsList] = useState(() => {
+    return Array.isArray(initialGroups) ? initialGroups : [];
+  });
 
   const [filters, setFilters] = useState({
     name: "",
@@ -41,19 +32,15 @@ function Groups() {
     status: "Активный",
   });
 
-  const [validationError, setValidationError] = useState("");
-
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleFormChange = (key, value) => {
-    setValidationError("");
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const openModal = (type, group = null) => {
-    setValidationError("");
     setModal({ type, data: group });
     if (type === "edit" && group) {
       setForm({
@@ -74,106 +61,104 @@ function Groups() {
     }
   };
 
-  const closeModal = () => {
-    setModal({ type: null, data: null });
-    setValidationError("");
-  };
+  const closeModal = () => setModal({ type: null, data: null });
 
   const handleSave = () => {
-    const trimmedName = form.name.trim();
-    const trimmedTeacher = form.teacher.trim();
-
-    if (!trimmedName || !trimmedTeacher) {
-      setValidationError(
-        "Название группы и Учитель обязательны для заполнения!",
-      );
+    if (!form.name.trim() || !form.teacher.trim()) {
+      alert("Название группы и Учитель обязательны!");
       return;
     }
-
-    const updatedFormData = {
-      ...form,
-      name: trimmedName,
-      teacher: trimmedTeacher,
-      time: form.time.trim(),
-      days: form.days.trim(),
-    };
 
     if (modal.type === "create") {
       const newId =
         groupsList.length > 0
-          ? Math.max(...groupsList.map((g) => Number(g?.id) || 0)) + 1
+          ? Math.max(...groupsList.map((g) => g?.id || 0)) + 1
           : 1;
-      setGroupsList((prev) => [...prev, { ...updatedFormData, id: newId }]);
+      setGroupsList([...groupsList, { ...form, id: newId }]);
     } else if (modal.type === "edit") {
-      setGroupsList((prev) =>
-        prev.map((g) =>
-          g.id === modal.data.id ? { ...g, ...updatedFormData } : g,
-        ),
+      setGroupsList(
+        groupsList.map((g) => (g.id === modal.data.id ? { ...g, ...form } : g)),
       );
     }
     closeModal();
   };
 
   const handleDelete = () => {
-    if (modal.data?.id) {
-      setGroupsList((prev) => prev.filter((g) => g.id !== modal.data.id));
-    }
+    setGroupsList(groupsList.filter((g) => g.id !== modal.data.id));
     closeModal();
   };
 
   const filteredGroups = groupsList.filter((g) => {
     if (!g) return false;
 
-    const matchesFields = fieldsConfig.every((field) => {
-      const groupValue = String(g[field.key] || "").toLowerCase();
-      const filterValue = String(filters[field.key] || "").toLowerCase();
+    const isMatched = (field) => {
+      const groupValue = g[field] ? String(g[field]).toLowerCase() : "";
+      const filterValue = filters[field]
+        ? String(filters[field]).toLowerCase()
+        : "";
       return groupValue.includes(filterValue);
-    });
+    };
 
-    const isActive = checkIsActive(g.status);
+    const statusStr = g.status ? String(g.status).toLowerCase() : "";
+    const isActive =
+      statusStr === "активный" ||
+      statusStr === "активная" ||
+      statusStr === "active";
 
-    return matchesFields && (!filters.activeOnly || isActive);
+    return (
+      isMatched("name") &&
+      isMatched("teacher") &&
+      isMatched("time") &&
+      isMatched("days") &&
+      (!filters.activeOnly || isActive)
+    );
   });
 
   return (
-    <div className="groups-page-container">
-      <div className="groups-top-bar">
-        <button className="btn-crimson-add" onClick={() => openModal("create")}>
-          Добавить группу
+    <div className="home-container">
+      <div className="table-header-bar">
+        <h2 className="table-title">Группы</h2>
+        <button
+          className="btn-confirm btn-add"
+          onClick={() => openModal("create")}
+        >
+          <FiPlus style={{ marginRight: "6px", fontSize: "16px" }} /> Добавить
+          группу
         </button>
       </div>
 
-      <div className="groups-card-table-container">
-        <table className="groups-custom-table">
+      <div className="home-table-container">
+        <table className="home-table">
           <thead>
-            <tr className="table-header-row">
-              <th style={{ width: "50px" }}>#</th>
-              <th>Название группы</th>
+            <tr>
+              <th style={{ width: "60px" }}>#</th>
+              <th>Названия группы</th>
               <th>Учитель</th>
               <th>Время уроков</th>
               <th>Дни уроков</th>
-              <th>Статус</th>
-              <th style={{ textAlign: "center" }}>Действие</th>
+              <th style={{ width: "150px" }}>Статус</th>
+              <th style={{ width: "100px", textAlign: "center" }}>Действие</th>
             </tr>
-            <tr className="table-filter-row">
+            <tr className="filter-row">
               <td></td>
               {fieldsConfig.map((field) => (
                 <td key={field.key}>
                   <input
                     type="text"
-                    className="table-filter-input"
+                    className="filter-input"
                     value={filters[field.key] || ""}
                     onChange={(e) =>
                       handleFilterChange(field.key, e.target.value)
                     }
-                    placeholder="Поиск..."
                   />
                 </td>
               ))}
               <td>
-                <div className="table-filter-toggle">
-                  <span>Активный</span>
-                  <label className="custom-switch">
+                <div className="filter-toggle">
+                  <span className="text-muted" style={{ fontWeight: "600" }}>
+                    Активный
+                  </span>
+                  <label className="switch">
                     <input
                       type="checkbox"
                       checked={filters.activeOnly || false}
@@ -181,45 +166,52 @@ function Groups() {
                         handleFilterChange("activeOnly", e.target.checked)
                       }
                     />
-                    <span className="custom-slider"></span>
+                    <span className="slider"></span>
                   </label>
                 </div>
               </td>
               <td style={{ textAlign: "center" }}>
-                <FiSearch className="table-search-icon" />
+                <FiSearch className="search-icon" />
               </td>
             </tr>
           </thead>
           <tbody>
             {filteredGroups.length > 0 ? (
               filteredGroups.map((group, index) => {
-                const isActive = checkIsActive(group.status);
+                const statusStr = group.status
+                  ? String(group.status).toLowerCase()
+                  : "";
+                const isActive =
+                  statusStr === "активный" ||
+                  statusStr === "активная" ||
+                  statusStr === "active";
                 return (
-                  <tr key={group.id} className="table-data-row">
-                    <td className="row-index">{index + 1}</td>
-                    <td className="row-bold">{group.name}</td>
+                  <tr key={group.id} className="row-normal">
+                    <td className="fw-600">{index + 1}</td>
+                    <td className="fw-600">{group.name}</td>
                     <td>{group.teacher}</td>
                     <td>{group.time}</td>
-                    <td>{group.days}</td>
+                    <td className="text-muted">{group.days}</td>
                     <td>
                       <span
-                        className={`status-pill ${
-                          isActive ? "pill-active" : "pill-inactive"
-                        }`}
+                        className={`status-badge ${isActive ? "badge-active" : "badge-inactive"}`}
                       >
                         {group.status}
                       </span>
                     </td>
                     <td>
-                      <div className="row-actions-cell">
+                      <div
+                        className="table-actions"
+                        style={{ justifyContent: "center" }}
+                      >
                         <button
-                          className="action-btn-edit"
+                          className="btn-act clr-blue"
                           onClick={() => openModal("edit", group)}
                         >
                           <FiEdit2 />
                         </button>
                         <button
-                          className="action-btn-delete"
+                          className="btn-act clr-red"
                           onClick={() => openModal("delete", group)}
                         >
                           <FiTrash2 />
@@ -235,8 +227,8 @@ function Groups() {
                   colSpan="7"
                   style={{
                     textAlign: "center",
-                    padding: "30px",
-                    color: "#9ca3af",
+                    padding: "40px",
+                    color: "#6b7280",
                   }}
                 >
                   Нет подходящих групп
@@ -248,35 +240,20 @@ function Groups() {
       </div>
 
       {modal.type && modal.type !== "delete" && (
-        <div className="custom-modal-overlay" onClick={closeModal}>
-          <div
-            className="custom-modal-box"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="modal-overlay">
+          <div className="modal-content">
             <h3>
               {modal.type === "create"
                 ? "Добавить группу"
                 : "Редактирование группы"}
             </h3>
 
-            {validationError && (
-              <div
-                style={{
-                  color: "#ef4444",
-                  marginBottom: "12px",
-                  fontSize: "14px",
-                }}
-              >
-                {validationError}
-              </div>
-            )}
-
             {fieldsConfig.map((field) => (
-              <div key={field.key} className="modal-input-group">
-                <label className="modal-field-label">{field.placeholder}</label>
+              <div key={field.key} style={{ marginBottom: "16px" }}>
+                <label className="modal-label">{field.placeholder}</label>
                 <input
                   type="text"
-                  className="modal-field-input"
+                  className="modal-input-field"
                   value={form[field.key] || ""}
                   onChange={(e) => handleFormChange(field.key, e.target.value)}
                   placeholder={field.placeholder}
@@ -284,23 +261,23 @@ function Groups() {
               </div>
             ))}
 
-            <div className="modal-input-group">
-              <label className="modal-field-label">Статус</label>
+            <div style={{ marginBottom: "24px" }}>
+              <label className="modal-label">Статус</label>
               <select
-                className="modal-field-input modal-select"
+                className="modal-input-field modal-select"
                 value={form.status || "Активный"}
                 onChange={(e) => handleFormChange("status", e.target.value)}
               >
                 <option value="Активный">Активный</option>
-                <option value="Неактивный">Неактивный</option>
+                <option value="Не активный">Не активный</option>
               </select>
             </div>
 
-            <div className="modal-footer-btns">
-              <button className="btn-modal-cancel" onClick={closeModal}>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={closeModal}>
                 Отмена
               </button>
-              <button className="btn-modal-submit" onClick={handleSave}>
+              <button className="btn-confirm" onClick={handleSave}>
                 {modal.type === "create" ? "Добавить" : "Сохранить"}
               </button>
             </div>
@@ -309,21 +286,15 @@ function Groups() {
       )}
 
       {modal.type === "delete" && (
-        <div className="custom-modal-overlay" onClick={closeModal}>
-          <div
-            className="custom-modal-box"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="modal-overlay">
+          <div className="modal-content">
             <h3>Удаление группы</h3>
             <p>Вы уверены, что хотите удалить эту группу?</p>
-            <div className="modal-footer-btns">
-              <button className="btn-modal-cancel" onClick={closeModal}>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={closeModal}>
                 Отмена
               </button>
-              <button
-                className="btn-modal-submit danger"
-                onClick={handleDelete}
-              >
+              <button className="btn-confirm danger" onClick={handleDelete}>
                 Удалить
               </button>
             </div>

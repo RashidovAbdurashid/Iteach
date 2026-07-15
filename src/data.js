@@ -78,3 +78,62 @@ export const initialStudents = [
     status: "row-danger",
   },
 ];
+
+export const initialGroups = [
+  {
+    id: 1,
+    name: "IELTS",
+    teacher: "Mr Abror",
+    time: "14:30 - 15:50",
+    days: "Понедельник, Среда, Пятница",
+    status: "Активный",
+  },
+  {
+    id: 2,
+    name: "GENERAL ENGLISH",
+    teacher: "Mr Nemat",
+    time: "10:00 - 11:20",
+    days: "Вторник, Четверг, Суббота",
+    status: "Не активный",
+  },
+  {
+    id: 3,
+    name: "IELTS",
+    teacher: "Mr Abror",
+    time: "12:30 - 13:50",
+    days: "Вторник, Четверг, Суббота",
+    status: "Не active",
+  },
+  {
+    id: 4,
+    name: "GENERAL ENGLISH",
+    teacher: "Mr Shokhrukh",
+    time: "16:00 - 17:20",
+    days: "Понедельник, Среда, Пятница",
+    status: "Активный",
+  },
+  {
+    id: 5,
+    name: "GENERAL ENGLISH",
+    teacher: "Mr Aziz",
+    time: "11:30 - 12:50",
+    days: "Понедельник, Среда, Пятница",
+    status: "Активный",
+  },
+  {
+    id: 6,
+    name: "GENERAL ENGLISH",
+    teacher: "Mr Shokhrukh",
+    time: "13:00 - 14:20",
+    days: "Понедельник, Среда, Пятница",
+    status: "Активный",
+  },
+  {
+    id: 7,
+    name: "IELTS",
+    teacher: "Mr Abror",
+    time: "17:30 - 18:50",
+    days: "Вторник, Четверг, Суббота",
+    status: "Не активный",
+  },
+];
