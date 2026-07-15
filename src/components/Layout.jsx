@@ -15,11 +15,6 @@ import { FiBell, FiSettings, FiGrid } from "react-icons/fi";
 import "../styles/Layout.css";
 
 function Layout() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
   return (
     <div className="layout-wrapper">
       <aside className="layout-sidebar">
@@ -63,13 +58,7 @@ function Layout() {
 
       <main className="layout-main">
         <header className="layout-navbar">
-
-
           <div className="navbar-actions">
-            <button className="btn-create" onClick={openModal}>
-              Создать
-            </button>
-
             <div className="navbar-icons">
               <button className="icon-btn">
                 <FiSettings />
@@ -95,24 +84,6 @@ function Layout() {
           <Outlet />
         </div>
       </main>
-
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Создать новую запись</h3>
-            <input type="text" className="modal-input" placeholder="Имя" />
-            <input type="text" className="modal-input" placeholder="Телефон" />
-            <div className="modal-actions">
-              <button className="btn-cancel" onClick={closeModal}>
-                Отмена
-              </button>
-              <button className="btn-confirm" onClick={closeModal}>
-                Сохранить
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

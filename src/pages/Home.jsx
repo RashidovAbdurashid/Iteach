@@ -6,7 +6,10 @@ import {
   FiAlertTriangle,
   FiEdit2,
   FiTrash2,
+  FiPlus,
 } from "react-icons/fi";
+
+import { initialStudents } from "../data";
 import "../styles/Home.css";
 
 function Home() {
@@ -25,7 +28,13 @@ function Home() {
       icon: <FiPhoneCall />,
       color: "st-purple",
     },
-    { id: 3, label: "Отказы", value: "3", icon: <FiUserX />, color: "st-pink" },
+    {
+      id: 3,
+      label: "Отказы",
+      value: "3",
+      icon: <FiUserX />,
+      color: "st-pink",
+    },
     {
       id: 4,
       label: "Должники",
@@ -35,86 +44,87 @@ function Home() {
     },
   ];
 
-  const initialStudents = [
-    {
-      id: 1,
-      subject: "IELTS",
-      name: "Абдуллах",
-      phone: "+998 99 310 22 10",
-      days: "Каждый день",
-      date1: "06/12/2024",
-      date2: "09:00 - 10:20",
-      note: "06.12 придет на консультаци",
-      status: "row-warn",
-    },
-    {
-      id: 2,
-      subject: "GENERAL ENGLISH",
-      name: "Абубакр",
-      phone: "+998 95 217 11 17",
-      days: "Вторник, Четверг, Суббота",
-      date1: "05/12/2024",
-      date2: "10:30 - 11:50",
-      note: "07.12 N-199",
-      status: "row-success",
-    },
-    {
-      id: 3,
-      subject: "IELTS",
-      name: "Саида",
-      phone: "+998 33 747 36 37",
-      days: "Понедельник, Среда, Пятница",
-      date1: "04/12/2024",
-      date2: "12:00 - 13:20",
-      note: "05.12 нету времени",
-      status: "row-normal",
-    },
-    {
-      id: 4,
-      subject: "GENERAL ENGLISH",
-      name: "Муниса",
-      phone: "+998 94 681 18 81",
-      days: "Каждый день",
-      date1: "04/12/2024",
-      date2: "14:00 - 15:20",
-      note: "Ждет группу",
-      status: "row-normal",
-    },
-    {
-      id: 5,
-      subject: "GENERAL ENGLISH",
-      name: "Хадича",
-      phone: "+998 90 908 14 26",
-      days: "Каждый день",
-      date1: "03/12/2024",
-      date2: "15:30 - 16:50",
-      note: "Хочет прийти на speaking",
-      status: "row-normal",
-    },
-    {
-      id: 6,
-      subject: "GENERAL ENGLISH",
-      name: "Моминбек",
-      phone: "+998 93 514 17 18",
-      days: "Каждый день",
-      date1: "03/12/2024",
-      date2: "17:00 - 18:20",
-      note: "Ушел",
-      status: "row-danger",
-    },
-  ];
-
   const [studentsList, setStudentsList] = useState(initialStudents);
   const [activeTab, setActiveTab] = useState("Записи");
 
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
+
   const [editModal, setEditModal] = useState({
     isOpen: false,
     id: null,
+    subject: "",
     name: "",
+    phone: "",
+    days: "",
+    date1: "",
+    date2: "",
+    note: "",
+    status: "row-normal",
+  });
+
+  const [createModal, setCreateModal] = useState({
+    isOpen: false,
+    subject: "",
+    name: "",
+    phone: "",
+    days: "",
+    date1: "",
+    date2: "",
+    note: "",
+    status: "row-normal",
   });
 
   const tabs = ["Записи", "Пробный урок", "Новые группы"];
+
+  const openCreateModal = () =>
+    setCreateModal({
+      isOpen: true,
+      subject: "",
+      name: "",
+      phone: "",
+      days: "",
+      date1: "",
+      date2: "",
+      note: "",
+      status: "row-normal",
+    });
+
+  const closeCreateModal = () =>
+    setCreateModal({
+      isOpen: false,
+      subject: "",
+      name: "",
+      phone: "",
+      days: "",
+      date1: "",
+      date2: "",
+      note: "",
+      status: "row-normal",
+    });
+
+  const confirmCreate = () => {
+    if (createModal.name.trim() !== "" && createModal.phone.trim() !== "") {
+      const newStudent = {
+        id:
+          studentsList.length > 0
+            ? Math.max(...studentsList.map((s) => s.id)) + 1
+            : 1,
+        subject: createModal.subject,
+        name: createModal.name,
+        phone: createModal.phone,
+        days: createModal.days,
+        date1: createModal.date1,
+        date2: createModal.date2,
+        note: createModal.note,
+        status: createModal.status,
+      };
+
+      setStudentsList([...studentsList, newStudent]);
+      closeCreateModal();
+    } else {
+      alert("Имя ученика и Номер телефона обязательны для заполнения!");
+    }
+  };
 
   const openDeleteModal = (id) => setDeleteModal({ isOpen: true, id });
 
@@ -128,18 +138,30 @@ function Home() {
   };
 
   const openEditModal = (student) =>
-    setEditModal({ isOpen: true, id: student.id, name: student.name });
+    setEditModal({
+      isOpen: true,
+      ...student,
+    });
 
   const closeEditModal = () =>
-    setEditModal({ isOpen: false, id: null, name: "" });
+    setEditModal({
+      isOpen: false,
+      id: null,
+      subject: "",
+      name: "",
+      phone: "",
+      days: "",
+      date1: "",
+      date2: "",
+      note: "",
+      status: "row-normal",
+    });
 
   const confirmEdit = () => {
-    if (editModal.name.trim() !== "") {
+    if (editModal.name.trim() !== "" && editModal.phone.trim() !== "") {
       setStudentsList(
         studentsList.map((student) =>
-          student.id === editModal.id
-            ? { ...student, name: editModal.name }
-            : student,
+          student.id === editModal.id ? { ...student, ...editModal } : student,
         ),
       );
     }
@@ -158,6 +180,14 @@ function Home() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="table-header-bar">
+        <h3 className="table-title">Список учеников</h3>
+        <button className="btn-confirm btn-add" onClick={openCreateModal}>
+          <FiPlus style={{ marginRight: "6px", fontSize: "16px" }} /> Добавить
+          ученика
+        </button>
       </div>
 
       <div className="home-table-container">
@@ -251,10 +281,141 @@ function Home() {
         </div>
       )}
 
+      {createModal.isOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Добавить нового ученика</h3>
+
+            <input
+              type="text"
+              className="modal-input"
+              value={createModal.subject}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, subject: e.target.value })
+              }
+              placeholder="Предмет (например: IELTS)"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={createModal.name}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, name: e.target.value })
+              }
+              placeholder="Имя ученика"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={createModal.phone}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, phone: e.target.value })
+              }
+              placeholder="Номер телефона"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={createModal.days}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, days: e.target.value })
+              }
+              placeholder="Дни уроков (например: Каждый день)"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={createModal.date1}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, date1: e.target.value })
+              }
+              placeholder="Дата (ДД/ММ/ГГГГ)"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={createModal.date2}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, date2: e.target.value })
+              }
+              placeholder="Время (ЧЧ:ММ - ЧЧ:ММ)"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={createModal.note}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, note: e.target.value })
+              }
+              placeholder="Примечание"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <label
+              className="modal-label"
+              style={{
+                fontSize: "12px",
+                color: "#6b7280",
+                display: "block",
+                marginBottom: "4px",
+              }}
+            >
+              Статус (Цвет строки)
+            </label>
+            <select
+              className="modal-input modal-select"
+              value={createModal.status}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, status: e.target.value })
+              }
+              style={{ marginBottom: "20px", width: "100%" }}
+            >
+              <option value="row-normal">Обычный (Белый)</option>
+              <option value="row-success">Успешный (Зеленый)</option>
+              <option value="row-warn">Внимание (Желтый)</option>
+              <option value="row-danger">Отказ / Должник (Красный)</option>
+            </select>
+
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={closeCreateModal}>
+                Отмена
+              </button>
+              <button className="btn-confirm" onClick={confirmCreate}>
+                Добавить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {editModal.isOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Редактирование ученика</h3>
+
+            <input
+              type="text"
+              className="modal-input"
+              value={editModal.subject}
+              onChange={(e) =>
+                setEditModal({ ...editModal, subject: e.target.value })
+              }
+              placeholder="Предмет"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
             <input
               type="text"
               className="modal-input"
@@ -263,7 +424,89 @@ function Home() {
                 setEditModal({ ...editModal, name: e.target.value })
               }
               placeholder="Имя ученика"
+              style={{ marginBottom: "10px", width: "100%" }}
             />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={editModal.phone}
+              onChange={(e) =>
+                setEditModal({ ...editModal, phone: e.target.value })
+              }
+              placeholder="Номер"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={editModal.days}
+              onChange={(e) =>
+                setEditModal({ ...editModal, days: e.target.value })
+              }
+              placeholder="Дни уроков"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={editModal.date1}
+              onChange={(e) =>
+                setEditModal({ ...editModal, date1: e.target.value })
+              }
+              placeholder="Дата (ДД/ММ/ГГГГ)"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={editModal.date2}
+              onChange={(e) =>
+                setEditModal({ ...editModal, date2: e.target.value })
+              }
+              placeholder="Время (ЧЧ:ММ - ЧЧ:ММ)"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <input
+              type="text"
+              className="modal-input"
+              value={editModal.note}
+              onChange={(e) =>
+                setEditModal({ ...editModal, note: e.target.value })
+              }
+              placeholder="Примечание"
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+
+            <label
+              className="modal-label"
+              style={{
+                fontSize: "12px",
+                color: "#6b7280",
+                display: "block",
+                marginBottom: "4px",
+              }}
+            >
+              Статус (Цвет строки)
+            </label>
+            <select
+              className="modal-input modal-select"
+              value={editModal.status}
+              onChange={(e) =>
+                setEditModal({ ...editModal, status: e.target.value })
+              }
+              style={{ marginBottom: "20px", width: "100%" }}
+            >
+              <option value="row-normal">Обычный (Белый)</option>
+              <option value="row-success">Успешный (Зеленый)</option>
+              <option value="row-warn">Внимание (Желтый)</option>
+              <option value="row-danger">Отказ / Должник (Красный)</option>
+            </select>
+
             <div className="modal-actions">
               <button className="btn-cancel" onClick={closeEditModal}>
                 Отмена

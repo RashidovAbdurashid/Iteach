@@ -4,55 +4,6 @@
   gap: 24px;
 }
 
-.home-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-.stat-box {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-}
-
-.st-blue { background-color: #e0f2fe; color: #0284c7; }
-.st-purple { background-color: #f3e8ff; color: #9333ea; }
-.st-pink { background-color: #fce7f3; color: #db2777; }
-.st-red { background-color: #fee2e2; color: #dc2626; }
-
-.stat-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-title {
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 4px;
-}
-
-.stat-number {
-  font-size: 24px;
-  font-weight: 700;
-  color: #111827;
-}
-
 .table-header-bar {
   display: flex;
   justify-content: space-between;
@@ -109,10 +60,9 @@
   border-bottom: none;
 }
 
-.row-warn { background-color: #fefce8; }
-.row-success { background-color: #f0fdf4; }
-.row-danger { background-color: #fef2f2; }
-.row-normal { background-color: #ffffff; }
+.row-normal {
+  background-color: #ffffff;
+}
 
 .home-table tr:hover td {
   filter: brightness(0.97);
@@ -141,36 +91,24 @@
   padding: 4px;
   border-radius: 6px;
   transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-act:hover {
   background-color: #e5e7eb;
 }
 
-.clr-blue { color: #0284c7; }
-.clr-red { color: #dc2626; }
-
-.home-tabs {
-  display: flex;
-  gap: 12px;
+.clr-blue {
+  color: #0284c7;
 }
 
-.tb-btn {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  color: #4b5563;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.2s;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+.clr-red {
+  color: #dc2626;
 }
 
-.tb-btn:hover { background-color: #f9fafb; }
-.tb-btn.active { background-color: #0284c7; color: #ffffff; border-color: #0284c7; }
-
+/* Modal Styllari */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -208,20 +146,29 @@
   margin-bottom: 24px;
 }
 
-.modal-input {
+.modal-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.modal-input-field {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  margin-bottom: 24px;
   font-size: 14px;
   color: #111827;
   box-sizing: border-box;
   outline: none;
+  transition: 0.15s ease;
 }
 
-.modal-input:focus {
+.modal-input-field:focus {
   border-color: #0284c7;
+  box-shadow: 0 0 0 1px #0284c7;
 }
 
 .modal-select {
@@ -272,4 +219,108 @@
 
 .btn-confirm.danger:hover {
   background: #b91c1c;
+}
+
+/* Filter qatori uchun qo'shimcha uslublar (Home dizayniga mos holda) */
+.filter-row td {
+  background-color: #f9fafb;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  transition: 0.15s;
+}
+
+.filter-input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 1px #0284c7;
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+/* Switch (On/Off) tugmasi - Home ranglariga mos */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d1d5db;
+  transition: 0.2s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.2s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #0284c7;
+}
+
+input:checked + .slider:before {
+  transform: translateX(16px);
+}
+
+.search-icon {
+  font-size: 18px;
+  color: #4b5563;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* Status Badgelari - Home stat-box ranglariga mos ravishda */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.badge-active {
+  background-color: #e0f2fe; /* st-blue kabi */
+  color: #0284c7;
+}
+
+.badge-inactive {
+  background-color: #f3f4f6;
+  color: #6b7280;
 }
