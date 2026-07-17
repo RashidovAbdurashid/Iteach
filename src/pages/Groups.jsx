@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiPlus, FiEdit2, FiTrash2, FiSearch } from "react-icons/fi";
-import { initialGroups } from "../data";
 import "../styles/Groups.css";
+
+const API_URL = "http://localhost:5000/groups";
 
 const fieldsConfig = [
   { key: "name", placeholder: "Названия группы" },
@@ -11,9 +12,8 @@ const fieldsConfig = [
 ];
 
 function Groups() {
-  const [groupsList, setGroupsList] = useState(() => {
-    return Array.isArray(initialGroups) ? initialGroups : [];
-  });
+  const [groupsList, setGroupsList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState({
     name: "",
@@ -31,6 +31,24 @@ function Groups() {
     days: "",
     status: "Активный",
   });
+
+  const fetchGroups = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error("Serverdan javob olishda xatolik!");
+      const data = await response.json();
+      setGroupsList(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Ma'lumotlarni yuklashda xatolik:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGroups();
+  }, []);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -63,29 +81,56 @@ function Groups() {
 
   const closeModal = () => setModal({ type: null, data: null });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim() || !form.teacher.trim()) {
       alert("Название группы и Учитель обязательны!");
       return;
     }
 
-    if (modal.type === "create") {
-      const newId =
-        groupsList.length > 0
-          ? Math.max(...groupsList.map((g) => g?.id || 0)) + 1
-          : 1;
-      setGroupsList([...groupsList, { ...form, id: newId }]);
-    } else if (modal.type === "edit") {
-      setGroupsList(
-        groupsList.map((g) => (g.id === modal.data.id ? { ...g, ...form } : g)),
-      );
+    try {
+      if (modal.type === "create") {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        if (!response.ok) throw new Error("Qo'shishda xatolik yuz berdi");
+        const newGroup = await response.json();
+        setGroupsList((prev) => [...prev, newGroup]);
+      } else if (modal.type === "edit") {
+        const response = await fetch(`${API_URL}/${modal.data.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        if (!response.ok) throw new Error("Tahrirlashda xatolik yuz berdi");
+        const updatedGroup = await response.json();
+        setGroupsList((prev) =>
+          prev.map((g) => (g.id === modal.data.id ? updatedGroup : g)),
+        );
+      }
+      closeModal();
+    } catch (error) {
+      console.error("Saqlashda xatolik:", error);
+      alert("Amalni bajarishda xatolik yuz berdi!");
     }
-    closeModal();
   };
 
-  const handleDelete = () => {
-    setGroupsList(groupsList.filter((g) => g.id !== modal.data.id));
-    closeModal();
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`${API_URL}/${modal.data.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setGroupsList((prev) => prev.filter((g) => g.id !== modal.data.id));
+        closeModal();
+      } else {
+        alert("O'chirishda xatolik yuz berdi!");
+      }
+    } catch (error) {
+      console.error("O'chirishda xatolik:", error);
+    }
   };
 
   const filteredGroups = groupsList.filter((g) => {
@@ -176,7 +221,16 @@ function Groups() {
             </tr>
           </thead>
           <tbody>
-            {filteredGroups.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td
+                  colSpan="7"
+                  style={{ textAlign: "center", padding: "30px" }}
+                >
+                  Загрузка данных...
+                </td>
+              </tr>
+            ) : filteredGroups.length > 0 ? (
               filteredGroups.map((group, index) => {
                 const statusStr = group.status
                   ? String(group.status).toLowerCase()
@@ -194,7 +248,9 @@ function Groups() {
                     <td className="text-muted">{group.days}</td>
                     <td>
                       <span
-                        className={`status-badge ${isActive ? "badge-active" : "badge-inactive"}`}
+                        className={`status-badge ${
+                          isActive ? "badge-active" : "badge-inactive"
+                        }`}
                       >
                         {group.status}
                       </span>

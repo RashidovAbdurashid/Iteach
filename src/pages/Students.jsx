@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiPlus, FiEdit2, FiTrash2, FiSearch } from "react-icons/fi";
-import { initialStudents } from "../data";
 import "../styles/Students.css";
+
+const API_URL = "http://localhost:5000/students";
 
 const fieldsConfig = [
   { key: "name", placeholder: "Имя" },
@@ -12,9 +13,8 @@ const fieldsConfig = [
 ];
 
 function Students() {
-  const [studentsList, setStudentsList] = useState(() => {
-    return Array.isArray(initialStudents) ? initialStudents : [];
-  });
+  const [studentsList, setStudentsList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState({
     name: "",
@@ -34,6 +34,24 @@ function Students() {
     group: "",
     status: "Активный",
   });
+
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error("Serverdan javob olishda xatolik!");
+      const data = await response.json();
+      setStudentsList(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Ma'lumotlarni yuklashda xatolik:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -68,31 +86,56 @@ function Students() {
 
   const closeModal = () => setModal({ type: null, data: null });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim() || !form.lastName.trim()) {
       alert("Имя и Фамилия обязательны!");
       return;
     }
 
-    if (modal.type === "create") {
-      const newId =
-        studentsList.length > 0
-          ? Math.max(...studentsList.map((s) => s?.id || 0)) + 1
-          : 1;
-      setStudentsList([...studentsList, { ...form, id: newId }]);
-    } else if (modal.type === "edit") {
-      setStudentsList(
-        studentsList.map((s) =>
-          s.id === modal.data.id ? { ...s, ...form } : s,
-        ),
-      );
+    try {
+      if (modal.type === "create") {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        if (!response.ok) throw new Error("Qo'shishda xatolik yuz berdi");
+        const newStudent = await response.json();
+        setStudentsList((prev) => [...prev, newStudent]);
+      } else if (modal.type === "edit") {
+        const response = await fetch(`${API_URL}/${modal.data.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        if (!response.ok) throw new Error("Tahrirlashda xatolik yuz berdi");
+        const updatedStudent = await response.json();
+        setStudentsList((prev) =>
+          prev.map((s) => (s.id === modal.data.id ? updatedStudent : s)),
+        );
+      }
+      closeModal();
+    } catch (error) {
+      console.error("Saqlashda xatolik:", error);
+      alert("Amalni bajarishda xatolik yuz berdi!");
     }
-    closeModal();
   };
 
-  const handleDelete = () => {
-    setStudentsList(studentsList.filter((s) => s.id !== modal.data.id));
-    closeModal();
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`${API_URL}/${modal.data.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setStudentsList((prev) => prev.filter((s) => s.id !== modal.data.id));
+        closeModal();
+      } else {
+        alert("O'chirishda xatolik yuz berdi!");
+      }
+    } catch (error) {
+      console.error("O'chirishda xatolik:", error);
+    }
   };
 
   const filteredStudents = studentsList.filter((s) => {
@@ -106,8 +149,11 @@ function Students() {
       return studentValue.includes(filterValue);
     };
 
-    const statusStr = s.status ? String(s.status) : "";
-    const isActive = statusStr === "Активный" || statusStr === "Активная";
+    const statusStr = s.status ? String(s.status).toLowerCase() : "";
+    const isActive =
+      statusStr === "активный" ||
+      statusStr === "активная" ||
+      statusStr === "active";
 
     return (
       isMatched("name") &&
@@ -131,7 +177,6 @@ function Students() {
           ученика
         </button>
       </div>
-
 
       <div className="home-table-container">
         <table className="home-table">
@@ -183,11 +228,24 @@ function Students() {
             </tr>
           </thead>
           <tbody>
-            {filteredStudents.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td
+                  colSpan="8"
+                  style={{ textAlign: "center", padding: "30px" }}
+                >
+                  Загрузка данных...
+                </td>
+              </tr>
+            ) : filteredStudents.length > 0 ? (
               filteredStudents.map((student, index) => {
+                const statusStr = student.status
+                  ? String(student.status).toLowerCase()
+                  : "";
                 const isActive =
-                  student.status === "Активный" ||
-                  student.status === "Активная";
+                  statusStr === "активный" ||
+                  statusStr === "активная" ||
+                  statusStr === "active";
                 return (
                   <tr key={student.id} className="row-normal">
                     <td>{index + 1}</td>
@@ -198,7 +256,9 @@ function Students() {
                     <td>{student.group}</td>
                     <td>
                       <span
-                        className={`status-badge ${isActive ? "badge-active" : "badge-inactive"}`}
+                        className={`status-badge ${
+                          isActive ? "badge-active" : "badge-inactive"
+                        }`}
                       >
                         {student.status}
                       </span>
@@ -242,7 +302,6 @@ function Students() {
           </tbody>
         </table>
       </div>
-
 
       {modal.type && modal.type !== "delete" && (
         <div className="modal-overlay">
@@ -290,7 +349,6 @@ function Students() {
           </div>
         </div>
       )}
-
 
       {modal.type === "delete" && (
         <div className="modal-overlay">

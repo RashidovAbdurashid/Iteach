@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FiCheckCircle,
   FiPhoneCall,
@@ -9,8 +9,9 @@ import {
   FiPlus,
 } from "react-icons/fi";
 
-import { initialStudents } from "../data";
 import "../styles/Home.css";
+
+const API_URL = "http://localhost:5000/students";
 
 function Home() {
   const stats = [
@@ -44,7 +45,8 @@ function Home() {
     },
   ];
 
-  const [studentsList, setStudentsList] = useState(initialStudents);
+  const [studentsList, setStudentsList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Записи");
 
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
@@ -76,7 +78,30 @@ function Home() {
 
   const tabs = ["Записи", "Пробный урок", "Новые группы"];
 
-  const openCreateModal = () =>
+  function fetchStudents() {
+    setLoading(true);
+    fetch(API_URL)
+      .then(function (res) {
+        if (!res.ok) {
+          throw new Error("Ошибка сервера");
+        }
+        return res.json();
+      })
+      .then(function (data) {
+        setStudentsList(data);
+        setLoading(false);
+      })
+      .catch(function (err) {
+        console.error("Xatolik:", err);
+        setLoading(false);
+      });
+  }
+
+  useEffect(function () {
+    fetchStudents();
+  }, []);
+
+  function openCreateModal() {
     setCreateModal({
       isOpen: true,
       subject: "",
@@ -88,8 +113,9 @@ function Home() {
       note: "",
       status: "row-normal",
     });
+  }
 
-  const closeCreateModal = () =>
+  function closeCreateModal() {
     setCreateModal({
       isOpen: false,
       subject: "",
@@ -101,14 +127,11 @@ function Home() {
       note: "",
       status: "row-normal",
     });
+  }
 
-  const confirmCreate = () => {
+  function confirmCreate() {
     if (createModal.name.trim() !== "" && createModal.phone.trim() !== "") {
       const newStudent = {
-        id:
-          studentsList.length > 0
-            ? Math.max(...studentsList.map((s) => s.id)) + 1
-            : 1,
         subject: createModal.subject,
         name: createModal.name,
         phone: createModal.phone,
@@ -119,31 +142,61 @@ function Home() {
         status: createModal.status,
       };
 
-      setStudentsList([...studentsList, newStudent]);
-      closeCreateModal();
+      fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newStudent),
+      })
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (createdData) {
+          setStudentsList(function (prev) {
+            return [...prev, createdData];
+          });
+          closeCreateModal();
+        })
+        .catch(function (err) {
+          console.error("Xatolik:", err);
+        });
     } else {
       alert("Имя ученика и Номер телефона обязательны для заполнения!");
     }
-  };
+  }
 
-  const openDeleteModal = (id) => setDeleteModal({ isOpen: true, id });
+  function openDeleteModal(id) {
+    setDeleteModal({ isOpen: true, id: id });
+  }
 
-  const closeDeleteModal = () => setDeleteModal({ isOpen: false, id: null });
+  function closeDeleteModal() {
+    setDeleteModal({ isOpen: false, id: null });
+  }
 
-  const confirmDelete = () => {
-    setStudentsList(
-      studentsList.filter((student) => student.id !== deleteModal.id),
-    );
-    closeDeleteModal();
-  };
+  function confirmDelete() {
+    fetch(`${API_URL}/${deleteModal.id}`, {
+      method: "DELETE",
+    })
+      .then(function () {
+        setStudentsList(function (prev) {
+          return prev.filter(function (student) {
+            return student.id !== deleteModal.id;
+          });
+        });
+        closeDeleteModal();
+      })
+      .catch(function (err) {
+        console.error("Xatolik:", err);
+      });
+  }
 
-  const openEditModal = (student) =>
+  function openEditModal(student) {
     setEditModal({
       isOpen: true,
       ...student,
     });
+  }
 
-  const closeEditModal = () =>
+  function closeEditModal() {
     setEditModal({
       isOpen: false,
       id: null,
@@ -156,30 +209,50 @@ function Home() {
       note: "",
       status: "row-normal",
     });
+  }
 
-  const confirmEdit = () => {
+  function confirmEdit() {
     if (editModal.name.trim() !== "" && editModal.phone.trim() !== "") {
-      setStudentsList(
-        studentsList.map((student) =>
-          student.id === editModal.id ? { ...student, ...editModal } : student,
-        ),
-      );
+      const { isOpen, ...updatedStudent } = editModal;
+
+      fetch(`${API_URL}/${editModal.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedStudent),
+      })
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (data) {
+          setStudentsList(function (prev) {
+            return prev.map(function (student) {
+              return student.id === data.id ? data : student;
+            });
+          });
+          closeEditModal();
+        })
+        .catch(function (err) {
+          console.error("Xatolik:", err);
+        });
+    } else {
+      alert("Имя ученика и Номер телефона обязательны!");
     }
-    closeEditModal();
-  };
+  }
 
   return (
     <div className="home-container">
       <div className="home-stats">
-        {stats.map((stat) => (
-          <div key={stat.id} className="stat-box">
-            <div className={`stat-icon ${stat.color}`}>{stat.icon}</div>
-            <div className="stat-info">
-              <span className="stat-title">{stat.label}</span>
-              <span className="stat-number">{stat.value}</span>
+        {stats.map(function (stat) {
+          return (
+            <div key={stat.id} className="stat-box">
+              <div className={`stat-icon ${stat.color}`}>{stat.icon}</div>
+              <div className="stat-info">
+                <span className="stat-title">{stat.label}</span>
+                <span className="stat-number">{stat.value}</span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="table-header-bar">
@@ -206,35 +279,50 @@ function Home() {
             </tr>
           </thead>
           <tbody>
-            {studentsList.length > 0 ? (
-              studentsList.map((student, index) => (
-                <tr key={student.id} className={student.status}>
-                  <td>{index + 1}</td>
-                  <td className="fw-600">{student.subject}</td>
-                  <td>{student.name}</td>
-                  <td>{student.phone}</td>
-                  <td>{student.days}</td>
-                  <td className="text-muted">{student.date1}</td>
-                  <td className="text-muted">{student.date2}</td>
-                  <td className="text-muted">{student.note}</td>
-                  <td>
-                    <div className="table-actions">
-                      <button
-                        className="btn-act clr-blue"
-                        onClick={() => openEditModal(student)}
-                      >
-                        <FiEdit2 />
-                      </button>
-                      <button
-                        className="btn-act clr-red"
-                        onClick={() => openDeleteModal(student.id)}
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+            {loading ? (
+              <tr>
+                <td
+                  colSpan="9"
+                  style={{ textAlign: "center", padding: "20px" }}
+                >
+                  Загрузка...
+                </td>
+              </tr>
+            ) : studentsList.length > 0 ? (
+              studentsList.map(function (student, index) {
+                return (
+                  <tr key={student.id} className={student.status}>
+                    <td>{index + 1}</td>
+                    <td className="fw-600">{student.subject}</td>
+                    <td>{student.name}</td>
+                    <td>{student.phone}</td>
+                    <td>{student.days}</td>
+                    <td className="text-muted">{student.dob}</td>
+                    <td className="text-muted">{student.time}</td>
+                    <td className="text-muted">{student.note}</td>
+                    <td>
+                      <div className="table-actions">
+                        <button
+                          className="btn-act clr-blue"
+                          onClick={function () {
+                            openEditModal(student);
+                          }}
+                        >
+                          <FiEdit2 />
+                        </button>
+                        <button
+                          className="btn-act clr-red"
+                          onClick={function () {
+                            openDeleteModal(student.id);
+                          }}
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td
@@ -250,15 +338,19 @@ function Home() {
       </div>
 
       <div className="home-tabs">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            className={`tb-btn ${activeTab === tab ? "active" : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
+        {tabs.map(function (tab) {
+          return (
+            <button
+              key={tab}
+              className={`tb-btn ${activeTab === tab ? "active" : ""}`}
+              onClick={function () {
+                setActiveTab(tab);
+              }}
+            >
+              {tab}
+            </button>
+          );
+        })}
       </div>
 
       {deleteModal.isOpen && (
@@ -290,9 +382,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={createModal.subject}
-              onChange={(e) =>
-                setCreateModal({ ...createModal, subject: e.target.value })
-              }
+              onChange={function (e) {
+                setCreateModal({ ...createModal, subject: e.target.value });
+              }}
               placeholder="Предмет (например: IELTS)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -301,9 +393,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={createModal.name}
-              onChange={(e) =>
-                setCreateModal({ ...createModal, name: e.target.value })
-              }
+              onChange={function (e) {
+                setCreateModal({ ...createModal, name: e.target.value });
+              }}
               placeholder="Имя ученика"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -312,9 +404,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={createModal.phone}
-              onChange={(e) =>
-                setCreateModal({ ...createModal, phone: e.target.value })
-              }
+              onChange={function (e) {
+                setCreateModal({ ...createModal, phone: e.target.value });
+              }}
               placeholder="Номер телефона"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -323,9 +415,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={createModal.days}
-              onChange={(e) =>
-                setCreateModal({ ...createModal, days: e.target.value })
-              }
+              onChange={function (e) {
+                setCreateModal({ ...createModal, days: e.target.value });
+              }}
               placeholder="Дни уроков (например: Каждый день)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -334,9 +426,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={createModal.date1}
-              onChange={(e) =>
-                setCreateModal({ ...createModal, date1: e.target.value })
-              }
+              onChange={function (e) {
+                setCreateModal({ ...createModal, date1: e.target.value });
+              }}
               placeholder="Дата (ДД/ММ/ГГГГ)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -345,9 +437,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={createModal.date2}
-              onChange={(e) =>
-                setCreateModal({ ...createModal, date2: e.target.value })
-              }
+              onChange={function (e) {
+                setCreateModal({ ...createModal, date2: e.target.value });
+              }}
               placeholder="Время (ЧЧ:ММ - ЧЧ:ММ)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -356,9 +448,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={createModal.note}
-              onChange={(e) =>
-                setCreateModal({ ...createModal, note: e.target.value })
-              }
+              onChange={function (e) {
+                setCreateModal({ ...createModal, note: e.target.value });
+              }}
               placeholder="Примечание"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -377,9 +469,9 @@ function Home() {
             <select
               className="modal-input modal-select"
               value={createModal.status}
-              onChange={(e) =>
-                setCreateModal({ ...createModal, status: e.target.value })
-              }
+              onChange={function (e) {
+                setCreateModal({ ...createModal, status: e.target.value });
+              }}
               style={{ marginBottom: "20px", width: "100%" }}
             >
               <option value="row-normal">Обычный (Белый)</option>
@@ -409,9 +501,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={editModal.subject}
-              onChange={(e) =>
-                setEditModal({ ...editModal, subject: e.target.value })
-              }
+              onChange={function (e) {
+                setEditModal({ ...editModal, subject: e.target.value });
+              }}
               placeholder="Предмет"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -420,9 +512,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={editModal.name}
-              onChange={(e) =>
-                setEditModal({ ...editModal, name: e.target.value })
-              }
+              onChange={function (e) {
+                setEditModal({ ...editModal, name: e.target.value });
+              }}
               placeholder="Имя ученика"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -431,9 +523,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={editModal.phone}
-              onChange={(e) =>
-                setEditModal({ ...editModal, phone: e.target.value })
-              }
+              onChange={function (e) {
+                setEditModal({ ...editModal, phone: e.target.value });
+              }}
               placeholder="Номер"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -442,9 +534,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={editModal.days}
-              onChange={(e) =>
-                setEditModal({ ...editModal, days: e.target.value })
-              }
+              onChange={function (e) {
+                setEditModal({ ...editModal, days: e.target.value });
+              }}
               placeholder="Дни уроков"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -453,9 +545,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={editModal.date1}
-              onChange={(e) =>
-                setEditModal({ ...editModal, date1: e.target.value })
-              }
+              onChange={function (e) {
+                setEditModal({ ...editModal, date1: e.target.value });
+              }}
               placeholder="Дата (ДД/ММ/ГГГГ)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -464,9 +556,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={editModal.date2}
-              onChange={(e) =>
-                setEditModal({ ...editModal, date2: e.target.value })
-              }
+              onChange={function (e) {
+                setEditModal({ ...editModal, date2: e.target.value });
+              }}
               placeholder="Время (ЧЧ:ММ - ЧЧ:ММ)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -475,9 +567,9 @@ function Home() {
               type="text"
               className="modal-input"
               value={editModal.note}
-              onChange={(e) =>
-                setEditModal({ ...editModal, note: e.target.value })
-              }
+              onChange={function (e) {
+                setEditModal({ ...editModal, note: e.target.value });
+              }}
               placeholder="Примечание"
               style={{ marginBottom: "10px", width: "100%" }}
             />
@@ -496,9 +588,9 @@ function Home() {
             <select
               className="modal-input modal-select"
               value={editModal.status}
-              onChange={(e) =>
-                setEditModal({ ...editModal, status: e.target.value })
-              }
+              onChange={function (e) {
+                setEditModal({ ...editModal, status: e.target.value });
+              }}
               style={{ marginBottom: "20px", width: "100%" }}
             >
               <option value="row-normal">Обычный (Белый)</option>

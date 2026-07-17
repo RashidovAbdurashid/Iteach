@@ -1,0 +1,115 @@
+{
+"students": [
+  {
+    "id": "3",
+    "subject": "IELTS",
+    "name": "Саида",
+    "lastName": "Юсупова",
+    "dob": "21/03/2006",
+    "group": "IELTS B1",
+    "phone": "+998 33 747 36 37",
+    "days": "Понедельник, Среда, Пятница",
+    "time": "12:00 - 13:20",
+    "note": "05.12 нет времени",
+    "status": "row-success"
+  },
+  {
+    "id": "4",
+    "subject": "GENERAL ENGLISH",
+    "name": "Муниса",
+    "lastName": "Рахимова",
+    "dob": "18/11/2007",
+    "group": "GE A2",
+    "phone": "+998 94 681 18 81",
+    "days": "Каждый день",
+    "time": "14:00 - 15:20",
+    "note": "Ждет группу",
+    "status": "row-normal"
+  },
+  {
+    "id": "5",
+    "subject": "GENERAL ENGLISH",
+    "name": "Хадича",
+    "lastName": "Турсунова",
+    "dob": "09/07/2005",
+    "group": "GE B1",
+    "phone": "+998 90 908 14 26",
+    "days": "Каждый день",
+    "time": "15:30 - 16:50",
+    "note": "Хочет прийти на speaking",
+    "status": "row-normal"
+  },
+  {
+    "id": "6",
+    "subject": "GENERAL ENGLISH",
+    "name": "Моминбек",
+    "lastName": "Собиров",
+    "dob": "27/01/2003",
+    "group": "GE C1",
+    "phone": "+998 93 514 17 18",
+    "days": "Каждый день",
+    "time": "17:00 - 18:20",
+    "note": "Ушел",
+    "status": "row-danger"
+  }
+],
+  "groups": [
+    {
+      "id": "1",
+      "name": "IELTS",
+      "teacher": "Mr Abror",
+      "time": "14:30 - 15:50",
+      "days": "Понедельник, Среда, Пятница",
+      "status": "Активный"
+    },
+    {
+      "id": "2",
+      "name": "GENERAL ENGLISH",
+      "teacher": "Mr Nemat",
+      "time": "10:00 - 11:20",
+      "days": "Вторник, Четверг, Суббота",
+      "status": "Не активный"
+    },
+    {
+      "id": "3",
+      "name": "IELTS",
+      "teacher": "Mr Abror",
+      "time": "12:30 - 13:50",
+      "days": "Вторник, Четверг, Суббота",
+      "status": "Не active"
+    },
+    {
+      "id": "4",
+      "name": "GENERAL ENGLISH",
+      "teacher": "Mr Shokhrukh",
+      "time": "16:00 - 17:20",
+      "days": "Понедельник, Среда, Пятница",
+      "status": "Активный"
+    },
+    {
+      "id": "5",
+      "name": "GENERAL ENGLISH",
+      "teacher": "Mr Aziz",
+      "time": "11:30 - 12:50",
+      "days": "Понедельник, Среда, Пятница",
+      "status": "Активный"
+    },
+    {
+      "id": "6",
+      "name": "GENERAL ENGLISH",
+      "teacher": "Mr Shokhrukh",
+      "time": "13:00 - 14:20",
+      "days": "Понедельник, Среда, Пятница",
+      "status": "Активный"
+    },
+    {
+      "id": "7",
+      "name": "IELTS",
+      "teacher": "Mr Abror",
+      "time": "17:30 - 18:50",
+      "days": "Вторник, Четверг, Суббота",
+      "status": "Не активный"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
