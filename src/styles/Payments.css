@@ -17,11 +17,8 @@
   font-weight: 600;
 }
 
-.btn-add {
-  display: flex;
-  align-items: center;
-  padding: 10px 16px;
-  font-size: 14px;
+.btn-confir{
+    margin-left: 1430px;
 }
 
 .home-table-container {
@@ -198,7 +195,7 @@
   background: #e5e7eb;
 }
 
-.btn-confirm {
+.btn-confir {
   background: #0284c7;
   color: #ffffff;
   border: none;
@@ -207,17 +204,19 @@
   cursor: pointer;
   font-weight: 500;
   transition: 0.2s;
+  align-items: center;
+  display: flex;
 }
 
-.btn-confirm:hover {
+.btn-confir:hover {
   background: #0369a1;
 }
 
-.btn-confirm.danger {
+.btn-confir.danger {
   background: #dc2626;
 }
 
-.btn-confirm.danger:hover {
+.btn-confir.danger:hover {
   background: #b91c1c;
 }
 
@@ -323,3 +322,4 @@ input:checked + .slider:before {
   background-color: #f3f4f6;
   color: #6b7280;
 }
+

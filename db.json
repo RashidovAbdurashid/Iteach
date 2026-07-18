@@ -1,58 +1,58 @@
 {
-"students": [
-  {
-    "id": "3",
-    "subject": "IELTS",
-    "name": "Саида",
-    "lastName": "Юсупова",
-    "dob": "21/03/2006",
-    "group": "IELTS B1",
-    "phone": "+998 33 747 36 37",
-    "days": "Понедельник, Среда, Пятница",
-    "time": "12:00 - 13:20",
-    "note": "05.12 нет времени",
-    "status": "row-success"
-  },
-  {
-    "id": "4",
-    "subject": "GENERAL ENGLISH",
-    "name": "Муниса",
-    "lastName": "Рахимова",
-    "dob": "18/11/2007",
-    "group": "GE A2",
-    "phone": "+998 94 681 18 81",
-    "days": "Каждый день",
-    "time": "14:00 - 15:20",
-    "note": "Ждет группу",
-    "status": "row-normal"
-  },
-  {
-    "id": "5",
-    "subject": "GENERAL ENGLISH",
-    "name": "Хадича",
-    "lastName": "Турсунова",
-    "dob": "09/07/2005",
-    "group": "GE B1",
-    "phone": "+998 90 908 14 26",
-    "days": "Каждый день",
-    "time": "15:30 - 16:50",
-    "note": "Хочет прийти на speaking",
-    "status": "row-normal"
-  },
-  {
-    "id": "6",
-    "subject": "GENERAL ENGLISH",
-    "name": "Моминбек",
-    "lastName": "Собиров",
-    "dob": "27/01/2003",
-    "group": "GE C1",
-    "phone": "+998 93 514 17 18",
-    "days": "Каждый день",
-    "time": "17:00 - 18:20",
-    "note": "Ушел",
-    "status": "row-danger"
-  }
-],
+  "students": [
+    {
+      "id": "3",
+      "subject": "IELTS",
+      "name": "Саида",
+      "lastName": "Юсупова",
+      "dob": "21/03/2006",
+      "group": "IELTS B1",
+      "phone": "+998 33 747 36 37",
+      "days": "Понедельник, Среда, Пятница",
+      "time": "12:00 - 13:20",
+      "note": "05.12 нет времени",
+      "status": "row-success"
+    },
+    {
+      "id": "4",
+      "subject": "GENERAL ENGLISH",
+      "name": "Муниса",
+      "lastName": "Рахимова",
+      "dob": "18/11/2007",
+      "group": "GE A2",
+      "phone": "+998 94 681 18 81",
+      "days": "Каждый день",
+      "time": "14:00 - 15:20",
+      "note": "Ждет группу",
+      "status": "row-normal"
+    },
+    {
+      "id": "5",
+      "subject": "GENERAL ENGLISH",
+      "name": "Хадича",
+      "lastName": "Турсунова",
+      "dob": "09/07/2005",
+      "group": "GE B1",
+      "phone": "+998 90 908 14 26",
+      "days": "Каждый день",
+      "time": "15:30 - 16:50",
+      "note": "Хочет прийти на speaking",
+      "status": "row-normal"
+    },
+    {
+      "id": "6",
+      "subject": "GENERAL ENGLISH",
+      "name": "Моминбек",
+      "lastName": "Собиров",
+      "dob": "27/01/2003",
+      "group": "GE C1",
+      "phone": "+998 93 514 17 18",
+      "days": "Каждый день",
+      "time": "17:00 - 18:20",
+      "note": "Ушел",
+      "status": "row-danger"
+    }
+  ],
   "groups": [
     {
       "id": "1",
@@ -109,6 +109,73 @@
       "time": "17:30 - 18:50",
       "days": "Вторник, Четверг, Суббота",
       "status": "Не активный"
+    }
+  ],
+  "payments": [
+    {
+      "id": "4",
+      "checkNumber": "25498",
+      "group": "N-177 Pre-Inter",
+      "student": "Бориева Хадича",
+      "teacher": "Бориева Хадича",
+      "paymentDate": "03.10.2024",
+      "discount": "0%",
+      "amount": "680.000 сум",
+      "month": "Ноябрь",
+      "paymentType": "Наличными",
+      "comment": ""
+    },
+    {
+      "id": "5",
+      "checkNumber": "25497",
+      "group": "N-180 Inter",
+      "student": "Латипов Моминбек",
+      "teacher": "Латипов Жахонгтр",
+      "paymentDate": "03.10.2024",
+      "discount": "0%",
+      "amount": "680.000 сум",
+      "month": "Ноябрь",
+      "paymentType": "Переводом",
+      "comment": ""
+    },
+    {
+      "id": "6",
+      "checkNumber": "25496",
+      "group": "N-179 Elementary",
+      "student": "Очилов Одилжон",
+      "teacher": "Очилов Тохир",
+      "paymentDate": "01.10.2024",
+      "discount": "0%",
+      "amount": "680.000 сум",
+      "month": "Ноябрь",
+      "paymentType": "Переводом",
+      "comment": ""
+    },
+    {
+      "id": "7",
+      "checkNumber": "25495",
+      "group": "N-165 IELTS Standard",
+      "student": "Каримов Бехруз",
+      "teacher": "Ахмедов Сардор",
+      "paymentDate": "28.09.2024",
+      "discount": "10%",
+      "amount": "612.000 сум",
+      "month": "Октябрь",
+      "paymentType": "Наличными",
+      "comment": "Chegirma berildi"
+    },
+    {
+      "checkNumber": "676767",
+      "group": "Ai",
+      "student": "KIM CHIN IN",
+      "teacher": "KYLIN DICTATOR",
+      "paymentDate": "03.04.1945",
+      "discount": "100%",
+      "amount": "0$",
+      "month": "Ноябрь",
+      "paymentType": "Бесплатно ",
+      "comment": "Ronaldo G.O.A.T",
+      "id": "YuloIkHzcr8"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Students from "./pages/Students";
 import Groups from "./pages/Groups";
+import Payments from "./pages/Payments";
 import "./App.css";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/students" element={<Students />} />
           <Route path="/groups" element={<Groups />} />
+          <Route path="/payment" element={<Payments />} />
         </Route>
       </Routes>
     </BrowserRouter>
