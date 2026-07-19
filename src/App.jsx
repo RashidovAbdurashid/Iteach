@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Students from "./pages/Students";
 import Groups from "./pages/Groups";
 import Payments from "./pages/Payments";
+import Workers from "./pages/Workers";
 import "./App.css";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/students" element={<Students />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/payment" element={<Payments />} />
+          <Route path="/employees" element={<Workers />} />
         </Route>
       </Routes>
     </BrowserRouter>
