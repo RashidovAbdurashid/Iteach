@@ -69,62 +69,71 @@ function Layout() {
         </div>
 
         <nav className="sidebar-menu">
-          <NavLink
-            to="/home"
-            className={({ isActive }) =>
-              isActive ? "menu-link active" : "menu-link"
-            }
-          >
-            <FaUserEdit className="menu-icon" /> Регистрация
-          </NavLink>
-          <NavLink
-            to="/students"
-            className={({ isActive }) =>
-              isActive ? "menu-link active" : "menu-link"
-            }
-          >
-            <FaUserGraduate className="menu-icon" /> Ученики
-          </NavLink>
-          <NavLink
-            to="/groups"
-            className={({ isActive }) =>
-              isActive ? "menu-link active" : "menu-link"
-            }
-          >
-            <FaUsers className="menu-icon" /> Группы
-          </NavLink>
-          <NavLink
-            to="/payment"
-            className={({ isActive }) =>
-              isActive ? "menu-link active" : "menu-link"
-            }
-          >
-            <FaMoneyCheckAlt className="menu-icon" /> Оплата
-          </NavLink>
-          <NavLink
-            to="/employees"
-            className={({ isActive }) =>
-              isActive ? "menu-link active" : "menu-link"
-            }
-          >
-            <FaUserTie className="menu-icon" /> Сотрудники
-          </NavLink>
-          <NavLink
-            to="/rooms"
-            className={({ isActive }) =>
-              isActive ? "menu-link active" : "menu-link"
-            }
-          >
-            <FaDoorOpen className="menu-icon" /> Комнаты
-          </NavLink>
-          <NavLink
-            to="/subjects"
-            className={({ isActive }) =>
-              isActive ? "menu-link active" : "menu-link"
-            }
-          >
-            <FaBook className="menu-icon" /> Предметы
-          </NavLink>
+          <div className="menu-links-scroll">
+            <NavLink
+              to="/home"
+              className={({ isActive }) =>
+                isActive ? "menu-link active" : "menu-link"
+              }
+            >
+              <FaUserEdit className="menu-icon" /> Регистрация
+            </NavLink>
+            <NavLink
+              to="/students"
+              className={({ isActive }) =>
+                isActive ? "menu-link active" : "menu-link"
+              }
+            >
+              <FaUserGraduate className="menu-icon" /> Ученики
+            </NavLink>
+            <NavLink
+              to="/groups"
+              className={({ isActive }) =>
+                isActive ? "menu-link active" : "menu-link"
+              }
+            >
+              <FaUsers className="menu-icon" /> Группы
+            </NavLink>
+            <NavLink
+              to="/payment"
+              className={({ isActive }) =>
+                isActive ? "menu-link active" : "menu-link"
+              }
+            >
+              <FaMoneyCheckAlt className="menu-icon" /> Оплата
+            </NavLink>
+            <NavLink
+              to="/employees"
+              className={({ isActive }) =>
+                isActive ? "menu-link active" : "menu-link"
+              }
+            >
+              <FaUserTie className="menu-icon" /> Сотрудники
+            </NavLink>
+            <NavLink
+              to="/rooms"
+              className={({ isActive }) =>
+                isActive ? "menu-link active" : "menu-link"
+              }
+            >
+              <FaDoorOpen className="menu-icon" /> Комнаты
+            </NavLink>
+            <NavLink
+              to="/subjects"
+              className={({ isActive }) =>
+                isActive ? "menu-link active" : "menu-link"
+              }
+            >
+              <FaBook className="menu-icon" /> Предметы
+            </NavLink>
+          </div>
+
+          <div className="sidebar-footer">
+            <hr className="sidebar-divider" />
+            <button className="menu-link logout-btn" onClick={handleLogout}>
+              <FiLogOut className="menu-icon" /> Выйти
+            </button>
+          </div>
         </nav>
       </aside>
 

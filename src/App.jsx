@@ -9,6 +9,8 @@ import Students from "./pages/Students";
 import Groups from "./pages/Groups";
 import Payments from "./pages/Payments";
 import Workers from "./pages/Workers";
+import Rooms from "./pages/Rooms";
+import Subjects from "./pages/Subjects";
 import "./App.css";
 
 function App() {
@@ -31,6 +33,8 @@ function App() {
           <Route path="/groups" element={<Groups />} />
           <Route path="/payment" element={<Payments />} />
           <Route path="/employees" element={<Workers />} />
+          <Route path="/rooms" element={<Rooms />} />
+          <Route path="/subjects" element={<Subjects />} />
         </Route>
       </Routes>
     </BrowserRouter>

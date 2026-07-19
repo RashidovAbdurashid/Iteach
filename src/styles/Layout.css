@@ -585,3 +585,43 @@ body.dark-theme .notification-text {
 body.dark-theme .dropdown-divider {
   border-color: #374151;
 }
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100% - 70px); 
+}
+
+.menu-links-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto; 
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.sidebar-divider {
+  border: 0;
+  height: 1px;
+  background: #e5e7eb;
+  margin-bottom: 10px;
+}
+
+.logout-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #dc2626;
+}
+
+.logout-btn:hover {
+  background-color: #fee2e2 !important; 
+  color: #b91c1c;
+}
