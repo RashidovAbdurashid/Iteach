@@ -115,7 +115,7 @@ function Rooms() {
           <thead>
             <tr>
               <th style={{ width: "60px" }}>#</th>
-              <th>Имя</th>
+              <th> название </th>
               <th style={{ textAlign: "right", paddingRight: "24px" }}>
                 Действия
               </th>
