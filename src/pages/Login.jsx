@@ -5,41 +5,23 @@ import { toast } from "react-toastify";
 function Login() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("username");
-  const [password, setPassword] = useState("password");
-  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("admin");
+  const [password, setPassword] = useState("admin123");
 
-  const handleLogin = async (event) => {
+  const handleLogin = (event) => {
     event.preventDefault();
-    setLoading(true);
 
-    try {
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
+    if (username === "admin" && password === "admin123") {
+      localStorage.setItem("isAuth", "true");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ username: "admin", name: "Администратор" }),
+      );
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("isAuth", "true");
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
-
-        toast.success("Tizimga muvaffaqiyatli kirdingiz!");
-        navigate("/home");
-      } else {
-        toast.error(data.message || "Login yoki parol xato!");
-      }
-    } catch (error) {
-      console.error("Login xatoligi:", error);
-      toast.error("Server bilan bog'lanishda xatolik yuz berdi!");
-    } finally {
-      setLoading(false);
+      toast.success("Tizimga muvaffaqiyatli kirdingiz!");
+      navigate("/home");
+    } else {
+      toast.error("Login yoki parol xato!");
     }
   };
 
@@ -66,8 +48,8 @@ function Login() {
           required
         />
 
-        <button type="submit" className="login-btn" disabled={loading}>
-          {loading ? "Kirilmoqda..." : "Kirish"}
+        <button type="submit" className="login-btn">
+          Kirish
         </button>
       </form>
     </div>
