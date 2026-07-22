@@ -3,24 +3,45 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 function Login() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("admin123");
+  const [username, setUsername] = useState("username");
+  const [password, setPassword] = useState("password");
+  const [loading, setLoading] = useState(false);
 
-function handleLogin(event) {
-  event.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setLoading(true);
 
-  if (username === "admin" && password === "admin123") {
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    localStorage.setItem("isAuth", "true");
+      const data = await response.json();
 
-    toast.success("Tizimga muvaffaqiyatli kirdingiz!");
-    navigate("/home");
-  } else {
-    toast.error("Login yoki parol xato!");
-  }
-}
+      if (response.ok) {
+        localStorage.setItem("isAuth", "true");
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+
+        toast.success("Tizimga muvaffaqiyatli kirdingiz!");
+        navigate("/home");
+      } else {
+        toast.error(data.message || "Login yoki parol xato!");
+      }
+    } catch (error) {
+      console.error("Login xatoligi:", error);
+      toast.error("Server bilan bog'lanishda xatolik yuz berdi!");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="login-container">
@@ -45,8 +66,8 @@ function handleLogin(event) {
           required
         />
 
-        <button type="submit" className="login-btn">
-          Kirish
+        <button type="submit" className="login-btn" disabled={loading}>
+          {loading ? "Kirilmoqda..." : "Kirish"}
         </button>
       </form>
     </div>

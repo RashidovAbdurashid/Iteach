@@ -18,6 +18,7 @@ function Layout() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
+  
 
   const [adminName, setAdminName] = useState("Администратор");
   const [siteName, setSiteName] = useState("Iteach");
@@ -25,6 +26,8 @@ function Layout() {
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
   });
+
+  
 
   const settingsRef = useRef(null);
   const notificationsRef = useRef(null);
@@ -58,6 +61,10 @@ function Layout() {
   const handleLogout = () => {
     setIsSettingsOpen(false);
     navigate("/login");
+  };
+
+  const handleProfileClick = () => {
+    navigate("/profile");
   };
 
   return (
@@ -157,8 +164,8 @@ function Layout() {
                     <button
                       className="dropdown-item"
                       onClick={() => {
-                        setActiveModal("profile");
                         setIsSettingsOpen(false);
+                        navigate("/profile");
                       }}
                     >
                       <FiUser className="item-icon" /> Профиль
@@ -217,7 +224,11 @@ function Layout() {
               </div>
             </div>
 
-            <div className="navbar-profile">
+            <div
+              className="navbar-profile"
+              onClick={handleProfileClick}
+              style={{ cursor: "pointer" }}
+            >
               <img
                 src={`https://ui-avatars.com/api/?name=${adminName}&background=0284c7&color=fff`}
                 alt="User"
@@ -233,29 +244,6 @@ function Layout() {
           <Outlet />
         </div>
       </main>
-
-      {activeModal === "profile" && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Редактировать профиль</h3>
-            <input
-              type="text"
-              className="modal-input"
-              value={adminName}
-              onChange={(e) => setAdminName(e.target.value)}
-              placeholder="Имя администратора"
-            />
-            <div className="modal-actions">
-              <button
-                className="btn-confirm"
-                onClick={() => setActiveModal(null)}
-              >
-                Сохранить
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {activeModal === "site" && (
         <div className="modal-overlay">

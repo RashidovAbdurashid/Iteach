@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   FiCheckCircle,
   FiPhoneCall,
@@ -14,37 +14,6 @@ import "../styles/Home.css";
 const API_URL = "http://localhost:5000/students";
 
 function Home() {
-  const stats = [
-    {
-      id: 1,
-      label: "Обработанно",
-      value: "1",
-      icon: <FiCheckCircle />,
-      color: "st-blue",
-    },
-    {
-      id: 2,
-      label: "В обработке",
-      value: "2",
-      icon: <FiPhoneCall />,
-      color: "st-purple",
-    },
-    {
-      id: 3,
-      label: "Отказы",
-      value: "3",
-      icon: <FiUserX />,
-      color: "st-pink",
-    },
-    {
-      id: 4,
-      label: "Должники",
-      value: "4",
-      icon: <FiAlertTriangle />,
-      color: "st-red",
-    },
-  ];
-
   const [studentsList, setStudentsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Записи");
@@ -58,8 +27,8 @@ function Home() {
     name: "",
     phone: "",
     days: "",
-    date1: "",
-    date2: "",
+    dob: "",
+    time: "",
     note: "",
     status: "row-normal",
   });
@@ -70,148 +39,128 @@ function Home() {
     name: "",
     phone: "",
     days: "",
-    date1: "",
-    date2: "",
+    dob: "",
+    time: "",
     note: "",
     status: "row-normal",
   });
 
   const tabs = ["Записи", "Пробный урок", "Новые группы"];
 
-  function fetchStudents() {
+  const stats = useMemo(
+    () => [
+      {
+        id: 1,
+        label: "Обработанно",
+        value: studentsList.filter((s) => s.status === "row-success").length,
+        icon: <FiCheckCircle />,
+        color: "st-blue",
+      },
+      {
+        id: 2,
+        label: "В обработке",
+        value: studentsList.filter((s) => s.status === "row-normal").length,
+        icon: <FiPhoneCall />,
+        color: "st-purple",
+      },
+      {
+        id: 3,
+        label: "Отказы",
+        value: studentsList.filter((s) => s.status === "row-danger").length,
+        icon: <FiUserX />,
+        color: "st-pink",
+      },
+      {
+        id: 4,
+        label: "Должники",
+        value: studentsList.filter((s) => s.status === "row-warn").length,
+        icon: <FiAlertTriangle />,
+        color: "st-red",
+      },
+    ],
+    [studentsList],
+  );
+
+  const fetchStudents = () => {
     setLoading(true);
     fetch(API_URL)
-      .then(function (res) {
-        if (!res.ok) {
-          throw new Error("Ошибка сервера");
-        }
+      .then((res) => {
+        if (!res.ok) throw new Error("Ошибка сервера");
         return res.json();
       })
-      .then(function (data) {
+      .then((data) => {
         setStudentsList(data);
         setLoading(false);
       })
-      .catch(function (err) {
-        console.error("Xatolik:", err);
+      .catch((err) => {
+        console.error("Ошибка:", err);
         setLoading(false);
       });
-  }
+  };
 
-  useEffect(function () {
+  useEffect(() => {
     fetchStudents();
   }, []);
 
-  function openCreateModal() {
+  const openCreateModal = () => {
     setCreateModal({
       isOpen: true,
       subject: "",
       name: "",
       phone: "",
       days: "",
-      date1: "",
-      date2: "",
+      dob: "",
+      time: "",
       note: "",
       status: "row-normal",
     });
-  }
+  };
 
-  function closeCreateModal() {
-    setCreateModal({
-      isOpen: false,
-      subject: "",
-      name: "",
-      phone: "",
-      days: "",
-      date1: "",
-      date2: "",
-      note: "",
-      status: "row-normal",
-    });
-  }
+  const closeCreateModal = () => {
+    setCreateModal((prev) => ({ ...prev, isOpen: false }));
+  };
 
-  function confirmCreate() {
+  const confirmCreate = () => {
     if (createModal.name.trim() !== "" && createModal.phone.trim() !== "") {
-      const newStudent = {
-        subject: createModal.subject,
-        name: createModal.name,
-        phone: createModal.phone,
-        days: createModal.days,
-        date1: createModal.date1,
-        date2: createModal.date2,
-        note: createModal.note,
-        status: createModal.status,
-      };
+      const { isOpen, ...newStudent } = createModal;
 
       fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newStudent),
       })
-        .then(function (res) {
-          return res.json();
-        })
-        .then(function (createdData) {
-          setStudentsList(function (prev) {
-            return [...prev, createdData];
-          });
+        .then((res) => res.json())
+        .then((createdData) => {
+          setStudentsList((prev) => [...prev, createdData]);
           closeCreateModal();
         })
-        .catch(function (err) {
-          console.error("Xatolik:", err);
-        });
+        .catch((err) => console.error("Ошибка:", err));
     } else {
       alert("Имя ученика и Номер телефона обязательны для заполнения!");
     }
-  }
+  };
 
-  function openDeleteModal(id) {
-    setDeleteModal({ isOpen: true, id: id });
-  }
+  const openDeleteModal = (id) => setDeleteModal({ isOpen: true, id });
+  const closeDeleteModal = () => setDeleteModal({ isOpen: false, id: null });
 
-  function closeDeleteModal() {
-    setDeleteModal({ isOpen: false, id: null });
-  }
-
-  function confirmDelete() {
-    fetch(`${API_URL}/${deleteModal.id}`, {
-      method: "DELETE",
-    })
-      .then(function () {
-        setStudentsList(function (prev) {
-          return prev.filter(function (student) {
-            return student.id !== deleteModal.id;
-          });
-        });
+  const confirmDelete = () => {
+    fetch(`${API_URL}/${deleteModal.id}`, { method: "DELETE" })
+      .then(() => {
+        setStudentsList((prev) => prev.filter((s) => s.id !== deleteModal.id));
         closeDeleteModal();
       })
-      .catch(function (err) {
-        console.error("Xatolik:", err);
-      });
-  }
+      .catch((err) => console.error("Ошибка:", err));
+  };
 
-  function openEditModal(student) {
-    setEditModal({
-      isOpen: true,
-      ...student,
-    });
-  }
+  const openEditModal = (student) => {
+    setEditModal({ isOpen: true, ...student });
+  };
 
-  function closeEditModal() {
-    setEditModal({
-      isOpen: false,
-      id: null,
-      subject: "",
-      name: "",
-      phone: "",
-      days: "",
-      date1: "",
-      date2: "",
-      note: "",
-      status: "row-normal",
-    });
-  }
+  const closeEditModal = () => {
+    setEditModal((prev) => ({ ...prev, isOpen: false }));
+  };
 
-  function confirmEdit() {
+  const confirmEdit = () => {
     if (editModal.name.trim() !== "" && editModal.phone.trim() !== "") {
       const { isOpen, ...updatedStudent } = editModal;
 
@@ -220,39 +169,31 @@ function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedStudent),
       })
-        .then(function (res) {
-          return res.json();
-        })
-        .then(function (data) {
-          setStudentsList(function (prev) {
-            return prev.map(function (student) {
-              return student.id === data.id ? data : student;
-            });
-          });
+        .then((res) => res.json())
+        .then((data) => {
+          setStudentsList((prev) =>
+            prev.map((student) => (student.id === data.id ? data : student)),
+          );
           closeEditModal();
         })
-        .catch(function (err) {
-          console.error("Xatolik:", err);
-        });
+        .catch((err) => console.error("Ошибка:", err));
     } else {
       alert("Имя ученика и Номер телефона обязательны!");
     }
-  }
+  };
 
   return (
     <div className="home-container">
       <div className="home-stats">
-        {stats.map(function (stat) {
-          return (
-            <div key={stat.id} className="stat-box">
-              <div className={`stat-icon ${stat.color}`}>{stat.icon}</div>
-              <div className="stat-info">
-                <span className="stat-title">{stat.label}</span>
-                <span className="stat-number">{stat.value}</span>
-              </div>
+        {stats.map((stat) => (
+          <div key={stat.id} className="stat-box">
+            <div className={`stat-icon ${stat.color}`}>{stat.icon}</div>
+            <div className="stat-info">
+              <span className="stat-title">{stat.label}</span>
+              <span className="stat-number">{stat.value}</span>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       <div className="table-header-bar">
@@ -289,40 +230,34 @@ function Home() {
                 </td>
               </tr>
             ) : studentsList.length > 0 ? (
-              studentsList.map(function (student, index) {
-                return (
-                  <tr key={student.id} className={student.status}>
-                    <td>{index + 1}</td>
-                    <td className="fw-600">{student.subject}</td>
-                    <td>{student.name}</td>
-                    <td>{student.phone}</td>
-                    <td>{student.days}</td>
-                    <td className="text-muted">{student.dob}</td>
-                    <td className="text-muted">{student.time}</td>
-                    <td className="text-muted">{student.note}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button
-                          className="btn-act clr-blue"
-                          onClick={function () {
-                            openEditModal(student);
-                          }}
-                        >
-                          <FiEdit2 />
-                        </button>
-                        <button
-                          className="btn-act clr-red"
-                          onClick={function () {
-                            openDeleteModal(student.id);
-                          }}
-                        >
-                          <FiTrash2 />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
+              studentsList.map((student, index) => (
+                <tr key={student.id} className={student.status}>
+                  <td>{index + 1}</td>
+                  <td className="fw-600">{student.subject}</td>
+                  <td>{student.name}</td>
+                  <td>{student.phone}</td>
+                  <td>{student.days}</td>
+                  <td className="text-muted">{student.dob}</td>
+                  <td className="text-muted">{student.time}</td>
+                  <td className="text-muted">{student.note}</td>
+                  <td>
+                    <div className="table-actions">
+                      <button
+                        className="btn-act clr-blue"
+                        onClick={() => openEditModal(student)}
+                      >
+                        <FiEdit2 />
+                      </button>
+                      <button
+                        className="btn-act clr-red"
+                        onClick={() => openDeleteModal(student.id)}
+                      >
+                        <FiTrash2 />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
             ) : (
               <tr>
                 <td
@@ -338,19 +273,15 @@ function Home() {
       </div>
 
       <div className="home-tabs">
-        {tabs.map(function (tab) {
-          return (
-            <button
-              key={tab}
-              className={`tb-btn ${activeTab === tab ? "active" : ""}`}
-              onClick={function () {
-                setActiveTab(tab);
-              }}
-            >
-              {tab}
-            </button>
-          );
-        })}
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            className={`tb-btn ${activeTab === tab ? "active" : ""}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       {deleteModal.isOpen && (
@@ -377,84 +308,76 @@ function Home() {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Добавить нового ученика</h3>
-
             <input
               type="text"
               className="modal-input"
               value={createModal.subject}
-              onChange={function (e) {
-                setCreateModal({ ...createModal, subject: e.target.value });
-              }}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, subject: e.target.value })
+              }
               placeholder="Предмет (например: IELTS)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
               value={createModal.name}
-              onChange={function (e) {
-                setCreateModal({ ...createModal, name: e.target.value });
-              }}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, name: e.target.value })
+              }
               placeholder="Имя ученика"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
               value={createModal.phone}
-              onChange={function (e) {
-                setCreateModal({ ...createModal, phone: e.target.value });
-              }}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, phone: e.target.value })
+              }
               placeholder="Номер телефона"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
               value={createModal.days}
-              onChange={function (e) {
-                setCreateModal({ ...createModal, days: e.target.value });
-              }}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, days: e.target.value })
+              }
               placeholder="Дни уроков (например: Каждый день)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
-              value={createModal.date1}
-              onChange={function (e) {
-                setCreateModal({ ...createModal, date1: e.target.value });
-              }}
+              value={createModal.dob}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, dob: e.target.value })
+              }
               placeholder="Дата (ДД/ММ/ГГГГ)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
-              value={createModal.date2}
-              onChange={function (e) {
-                setCreateModal({ ...createModal, date2: e.target.value });
-              }}
+              value={createModal.time}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, time: e.target.value })
+              }
               placeholder="Время (ЧЧ:ММ - ЧЧ:ММ)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
               value={createModal.note}
-              onChange={function (e) {
-                setCreateModal({ ...createModal, note: e.target.value });
-              }}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, note: e.target.value })
+              }
               placeholder="Примечание"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <label
               className="modal-label"
               style={{
@@ -469,9 +392,9 @@ function Home() {
             <select
               className="modal-input modal-select"
               value={createModal.status}
-              onChange={function (e) {
-                setCreateModal({ ...createModal, status: e.target.value });
-              }}
+              onChange={(e) =>
+                setCreateModal({ ...createModal, status: e.target.value })
+              }
               style={{ marginBottom: "20px", width: "100%" }}
             >
               <option value="row-normal">Обычный (Белый)</option>
@@ -496,84 +419,76 @@ function Home() {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Редактирование ученика</h3>
-
             <input
               type="text"
               className="modal-input"
               value={editModal.subject}
-              onChange={function (e) {
-                setEditModal({ ...editModal, subject: e.target.value });
-              }}
+              onChange={(e) =>
+                setEditModal({ ...editModal, subject: e.target.value })
+              }
               placeholder="Предмет"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
               value={editModal.name}
-              onChange={function (e) {
-                setEditModal({ ...editModal, name: e.target.value });
-              }}
+              onChange={(e) =>
+                setEditModal({ ...editModal, name: e.target.value })
+              }
               placeholder="Имя ученика"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
               value={editModal.phone}
-              onChange={function (e) {
-                setEditModal({ ...editModal, phone: e.target.value });
-              }}
+              onChange={(e) =>
+                setEditModal({ ...editModal, phone: e.target.value })
+              }
               placeholder="Номер"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
               value={editModal.days}
-              onChange={function (e) {
-                setEditModal({ ...editModal, days: e.target.value });
-              }}
+              onChange={(e) =>
+                setEditModal({ ...editModal, days: e.target.value })
+              }
               placeholder="Дни уроков"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
-              value={editModal.date1}
-              onChange={function (e) {
-                setEditModal({ ...editModal, date1: e.target.value });
-              }}
+              value={editModal.dob}
+              onChange={(e) =>
+                setEditModal({ ...editModal, dob: e.target.value })
+              }
               placeholder="Дата (ДД/ММ/ГГГГ)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
-              value={editModal.date2}
-              onChange={function (e) {
-                setEditModal({ ...editModal, date2: e.target.value });
-              }}
+              value={editModal.time}
+              onChange={(e) =>
+                setEditModal({ ...editModal, time: e.target.value })
+              }
               placeholder="Время (ЧЧ:ММ - ЧЧ:ММ)"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <input
               type="text"
               className="modal-input"
               value={editModal.note}
-              onChange={function (e) {
-                setEditModal({ ...editModal, note: e.target.value });
-              }}
+              onChange={(e) =>
+                setEditModal({ ...editModal, note: e.target.value })
+              }
               placeholder="Примечание"
               style={{ marginBottom: "10px", width: "100%" }}
             />
-
             <label
               className="modal-label"
               style={{
@@ -588,9 +503,9 @@ function Home() {
             <select
               className="modal-input modal-select"
               value={editModal.status}
-              onChange={function (e) {
-                setEditModal({ ...editModal, status: e.target.value });
-              }}
+              onChange={(e) =>
+                setEditModal({ ...editModal, status: e.target.value })
+              }
               style={{ marginBottom: "20px", width: "100%" }}
             >
               <option value="row-normal">Обычный (Белый)</option>

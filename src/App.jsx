@@ -11,6 +11,7 @@ import Payments from "./pages/Payments";
 import Workers from "./pages/Workers";
 import Rooms from "./pages/Rooms";
 import Subjects from "./pages/Subjects";
+import Profile from "./pages/Profile";
 import "./App.css";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
         >
           <Route index element={<Navigate to="/login" replace />} />
           <Route path="/home" element={<Home />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="/students" element={<Students />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/payment" element={<Payments />} />

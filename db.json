@@ -11,7 +11,7 @@
       "days": "Понедельник, Среда, Пятница",
       "time": "12:00 - 13:20",
       "note": "05.12 нет времени",
-      "status": "row-success"
+      "status": "row-normal"
     },
     {
       "id": "4",
@@ -37,7 +37,7 @@
       "days": "Каждый день",
       "time": "15:30 - 16:50",
       "note": "Хочет прийти на speaking",
-      "status": "row-normal"
+      "status": "row-warn"
     },
     {
       "id": "6",
@@ -113,7 +113,6 @@
   ],
   "payments": [
     {
-      "id": "4",
       "checkNumber": "25498",
       "group": "N-177 Pre-Inter",
       "student": "Бориева Хадича",
@@ -123,7 +122,8 @@
       "amount": "680.000 сум",
       "month": "Ноябрь",
       "paymentType": "Наличными",
-      "comment": ""
+      "comment": "",
+      "id": "4"
     },
     {
       "id": "5",
@@ -163,30 +163,17 @@
       "month": "Октябрь",
       "paymentType": "Наличными",
       "comment": "Chegirma berildi"
-    },
-    {
-      "checkNumber": "676767",
-      "group": "Ai",
-      "student": "KIM CHIN IN",
-      "teacher": "KYLIN DICTATOR",
-      "paymentDate": "03.04.1945",
-      "discount": "100%",
-      "amount": "0$",
-      "month": "Ноябрь",
-      "paymentType": "Бесплатно ",
-      "comment": "Ronaldo G.O.A.T",
-      "id": "YuloIkHzcr8"
     }
   ],
   "workers": [
     {
-      "id": "1",
       "name": "Аброр",
       "lastName": "Абдурахмонов",
       "dob": "10.04.1998",
       "phone": "+998 99 310 22 10",
       "role": "Учитель",
-      "status": "Активный"
+      "status": "Активный",
+      "id": "1"
     },
     {
       "id": "2",
@@ -226,22 +213,72 @@
     }
   ],
   "rooms": [
-    { "id": "1", "name": "Study room 1" },
-    { "id": "2", "name": "Study room 2" },
-    { "id": "3", "name": "Study room 3" },
-    { "id": "4", "name": "Study room (large room)" },
-    { "id": "5", "name": "Study room 1" },
-    { "id": "6", "name": "Study room (small room)" }
+    {
+      "id": "1",
+      "name": "Study room 1"
+    },
+    {
+      "id": "2",
+      "name": "Study room 2"
+    },
+    {
+      "id": "3",
+      "name": "Study room 3"
+    },
+    {
+      "id": "4",
+      "name": "Study room (large room)"
+    },
+    {
+      "id": "5",
+      "name": "Study room 1"
+    },
+    {
+      "id": "6",
+      "name": "Study room (small room)"
+    }
   ],
   "subjects": [
-    { "id": "1", "name": "GENERAL ENGLISH", "status": "Активный" },
-    { "id": "2", "name": "IELTS", "status": "Не активный" },
-    { "id": "3", "name": "CEFR", "status": "Активный" },
-    { "id": "4", "name": "MATHEMATICS", "status": "Активный" },
-    { "id": "5", "name": "RUSSIAN LANGUAGE", "status": "Не активный" },
-    { "id": "6", "name": "ARABIC", "status": "Активный" },
-    { "id": "7", "name": "SAT MATH", "status": "Активный" },
-    { "id": "8", "name": "PRE-IELTS", "status": "Активный" }
+    {
+      "id": "1",
+      "name": "GENERAL ENGLISH",
+      "status": "Активный"
+    },
+    {
+      "id": "2",
+      "name": "IELTS",
+      "status": "Не активный"
+    },
+    {
+      "id": "3",
+      "name": "CEFR",
+      "status": "Активный"
+    },
+    {
+      "id": "4",
+      "name": "MATHEMATICS",
+      "status": "Активный"
+    },
+    {
+      "id": "5",
+      "name": "RUSSIAN LANGUAGE",
+      "status": "Не активный"
+    },
+    {
+      "id": "6",
+      "name": "ARABIC",
+      "status": "Активный"
+    },
+    {
+      "id": "7",
+      "name": "SAT MATH",
+      "status": "Активный"
+    },
+    {
+      "id": "8",
+      "name": "PRE-IELTS",
+      "status": "Активный"
+    }
   ],
   "$schema": "./node_modules/json-server/schema.json"
 }
